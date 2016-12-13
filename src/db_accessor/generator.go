@@ -14,5 +14,11 @@ func CreateTestTableGenerator() *TTestTableGenerator {
 }
 
 func (this *TTestTableGenerator) Generate() {
+	this.CreateTable()
+}
 
+func (this *TTestTableGenerator) CreateTable() {
+	var transaction, transactionOpeningResult = this.Connection.Begin()
+	Assert(transactionOpeningResult)
+	transaction.Exec("CREATE TABLE IF NOT EXISTS 'Notes' ('id' INT, 'text' TEXT);")
 }
