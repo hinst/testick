@@ -14,12 +14,13 @@ func CreateTestTableGenerator() *TTestTableGenerator {
 }
 
 func (this *TTestTableGenerator) Generate() {
-	this.CreateTable()
-}
-
-func (this *TTestTableGenerator) CreateTable() {
 	var transaction, transactionOpeningResult = this.Connection.Begin()
 	Assert(transactionOpeningResult)
 	defer transaction.Commit()
-	transaction.Exec("CREATE TABLE IF NOT EXISTS 'Notes' ('id' INT, 'text' TEXT);")
+	this.CreateTable(transaction)
+}
+
+func (this *TTestTableGenerator) CreateTable(transaction *sql.Tx) {
+	var _, executionResult = transaction.Exec("CREATE TABLE IF NOT EXISTS 'Notes' ('id' INT, 'text' TEXT);")
+	Assert(executionResult)
 }
