@@ -21,6 +21,6 @@ func (this *TTestTableGenerator) Generate() {
 }
 
 func (this *TTestTableGenerator) CreateTable(transaction *sql.Tx) {
-	var _, executionResult = transaction.Exec("CREATE TABLE IF NOT EXISTS 'Notes' ('id' INT, 'text' TEXT);")
+	var _, executionResult = transaction.Exec("CREATE TABLE IF NOT EXISTS Notes (id INT, text TEXT);")
 	Assert(executionResult)
 }
