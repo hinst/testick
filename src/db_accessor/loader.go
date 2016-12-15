@@ -2,10 +2,11 @@ package db_accessor
 
 import "database/sql"
 
-type TableLoader struct {
+type TTableLoader struct {
 	Query      string
 	Connection *sql.DB
+	GroupSize  int
 }
 
-func (this *TableLoader) Load() {
+func (this *TTableLoader) Load() {
 }

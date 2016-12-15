@@ -18,3 +18,7 @@ func (this *TNoteRow) Insert(tableName string, transaction *sql.Tx) {
 		this.Id, this.Text)
 	Assert(executionResult)
 }
+
+func (this *TNoteRow) Load() {
+
+}
