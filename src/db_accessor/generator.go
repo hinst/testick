@@ -27,6 +27,7 @@ func (this *TTestTableGenerator) Generate() {
 	Assert(transactionOpeningResult)
 	defer transaction.Commit()
 	this.CreateTable(transaction)
+	this.WriteRows(transaction)
 }
 
 func (this *TTestTableGenerator) CreateTable(transaction *sql.Tx) {
@@ -50,4 +51,11 @@ func (this *TTestTableGenerator) GenerateRow(id int32) *TNoteRow {
 	result.Id = id
 	result.Text = this.GenerateText()
 	return result
+}
+
+func (this *TTestTableGenerator) WriteRows(transaction *sql.Tx) {
+	for i := 0; i < this.RowCount; i++ {
+		var row = this.GenerateRow(int32(i))
+		row.Insert("Notes", transaction)
+	}
 }
