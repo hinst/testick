@@ -2,7 +2,6 @@ package db_accessor
 
 import (
 	"database/sql"
-	"fmt"
 	"strings"
 )
 
@@ -11,7 +10,7 @@ type TReadTest struct {
 }
 
 func (this *TReadTest) Run() {
-	fmt.Println("Starting test...")
+	WriteLog("Starting test...")
 	var loader = CreateTableLoader()
 	loader.Connection = this.Connection
 	loader.CreateRow = func() IRow { return CreateNoteRow() }
@@ -25,4 +24,5 @@ func (this *TReadTest) Run() {
 			goldCount++
 		}
 	}
+	WriteLog("Exiting test...")
 }
