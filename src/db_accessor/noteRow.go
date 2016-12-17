@@ -20,5 +20,6 @@ func (this *TNoteRow) Insert(tableName string, transaction *sql.Tx) {
 }
 
 func (this *TNoteRow) Load(rows *sql.Rows) {
-	rows.Scan(&this.Id, &this.Text)
+	var scanResult = rows.Scan(&this.Id, &this.Text)
+	Assert(scanResult)
 }

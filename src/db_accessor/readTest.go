@@ -2,11 +2,17 @@ package db_accessor
 
 import (
 	"database/sql"
+	"strconv"
 	"strings"
 )
 
 type TReadTest struct {
 	Connection *sql.DB
+}
+
+func CreateReadTest() *TReadTest {
+	var result = &TReadTest{}
+	return result
 }
 
 func (this *TReadTest) Run() {
@@ -24,5 +30,6 @@ func (this *TReadTest) Run() {
 			goldCount++
 		}
 	}
-	WriteLog("Exiting test...")
+	loader.Roll()
+	WriteLog("total=" + strconv.Itoa(totalCount) + " gold=" + strconv.Itoa(goldCount))
 }
