@@ -3,12 +3,18 @@ package db_accessor
 import (
 	"database/sql"
 	"strconv"
+	"sync"
 )
 
 type TTableLoader struct {
-	Query      string
-	Connection *sql.DB
-	GroupSize  int
+	Query            string
+	Connection       *sql.DB
+	GroupSize        int
+	Pool             sync.Pool
+	CreateRow        func() IRow
+	ReceiveRow       func(row IRow)
+	ReceiveRowPooled func(row IRow)
+	RowChannel       chan IRow
 }
 
 func CreateTableLoader() (result *TTableLoader) {
@@ -17,10 +23,28 @@ func CreateTableLoader() (result *TTableLoader) {
 	return
 }
 
+func (this *TTableLoader) RollPrepare() {
+	this.Pool.New = this.GetCreateRowForPool()
+	this.ReceiveRowPooled = func(row IRow) {
+		this.ReceiveRow(row)
+		this.Pool.Put(row)
+	}
+	this.RowChannel = make(chan IRow, 8)
+}
+
 func (this *TTableLoader) Roll() {
+	this.RollPrepare()
 	var transaction, transactionBeginResult = this.Connection.Begin()
 	Assert(transactionBeginResult)
 	defer transaction.Commit()
+	var offset = 0
+	for this.RollGroup(offset, transaction) {
+		offset += this.GroupSize
+	}
+}
+
+func (this *TTableLoader) RollFinalize() {
+	close(this.RowChannel)
 }
 
 func (this *TTableLoader) RollGroup(offset int, transaction *sql.Tx) bool {
@@ -30,7 +54,15 @@ func (this *TTableLoader) RollGroup(offset int, transaction *sql.Tx) bool {
 	Assert(queryResult)
 	defer rows.Close()
 	for rows.Next() {
+		var row = this.Pool.Get().(IRow)
+		row.Load(rows)
 		result = true
 	}
 	return result
+}
+
+func (this *TTableLoader) GetCreateRowForPool() func() interface{} {
+	return func() interface{} {
+		return this.CreateRow()
+	}
 }

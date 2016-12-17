@@ -19,6 +19,6 @@ func (this *TNoteRow) Insert(tableName string, transaction *sql.Tx) {
 	Assert(executionResult)
 }
 
-func (this *TNoteRow) Load() {
-
+func (this *TNoteRow) Load(rows *sql.Rows) {
+	rows.Scan(&this.Id, &this.Text)
 }

@@ -1,5 +1,7 @@
 package db_accessor
 
+import "database/sql"
+
 type IRow interface {
-	Load()
+	Load(rows *sql.Rows)
 }
