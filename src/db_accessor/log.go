@@ -4,6 +4,6 @@ import "fmt"
 import "time"
 
 func WriteLog(s string) {
-	s = time.Now().Format("") + "" + s
+	s = TimeToString(time.Now()) + ": " + s
 	fmt.Println(s)
 }
