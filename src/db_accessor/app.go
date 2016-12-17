@@ -9,6 +9,7 @@ type TApp struct {
 func (this *TApp) Run() {
 	this.Connect()
 	this.Read()
+	this.Read()
 }
 
 func (this *TApp) Connect() {

@@ -51,7 +51,6 @@ func (this *TTableLoader) RollFinalize() {
 
 func (this *TTableLoader) RollGroup(transaction *sql.Tx) bool {
 	var result = false
-	WriteLog(this.Query)
 	var rows, queryResult = transaction.Query(this.Query)
 	Assert(queryResult)
 	defer rows.Close()
