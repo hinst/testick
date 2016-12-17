@@ -7,14 +7,13 @@ import (
 )
 
 type TTableLoader struct {
-	Query            string
-	Connection       *sql.DB
-	GroupSize        int
-	Pool             sync.Pool
-	CreateRow        func() IRow
-	ReceiveRow       func(row IRow)
-	ReceiveRowPooled func(row IRow)
-	RowChannel       chan IRow
+	Query      string
+	Connection *sql.DB
+	GroupSize  int
+	Pool       sync.Pool
+	CreateRow  func() IRow
+	ReceiveRow func(row IRow)
+	RowChannel chan IRow
 }
 
 func CreateTableLoader() (result *TTableLoader) {
@@ -25,11 +24,14 @@ func CreateTableLoader() (result *TTableLoader) {
 
 func (this *TTableLoader) RollPrepare() {
 	this.Pool.New = this.GetCreateRowForPool()
-	this.ReceiveRowPooled = func(row IRow) {
-		this.ReceiveRow(row)
-		this.Pool.Put(row)
-	}
 	this.RowChannel = make(chan IRow, 8)
+	go this.RollReceive()
+}
+
+func (this *TTableLoader) RollReceive() {
+	for row := range this.RowChannel {
+		this.ReceiveRow(row)
+	}
 }
 
 func (this *TTableLoader) Roll() {
@@ -41,6 +43,7 @@ func (this *TTableLoader) Roll() {
 	for this.RollGroup(offset, transaction) {
 		offset += this.GroupSize
 	}
+	this.RollFinalize()
 }
 
 func (this *TTableLoader) RollFinalize() {
